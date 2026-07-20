@@ -81,15 +81,20 @@ El proyecto está preparado para producción y utiliza variables de entorno carg
 
 ## 🧠 Métodos y Pruebas Soportadas
 
-### Generadores (N = 6):
+### Generadores (N configurable, por defecto N = 20):
 * **Método de Cuadrados Medios**: Eleva la semilla de *d* dígitos al cuadrado, extrae los *d* dígitos centrales como la siguiente semilla y normaliza dividiendo entre $10^d$.
 * **Método Congruencial Lineal**: Usa la relación recursiva $X_{n+1} = (a \cdot X_n + c) \pmod m$ y normaliza $U_{n+1} = X_{n+1} / m$.
 
-### Pruebas de Validación ($\alpha = 0.05$):
-* **Prueba de Media**: Compara la media muestral contra el valor esperado de 0.5.
-* **Prueba de Varianza**: Evalúa si la varianza muestral es estadísticamente igual a 1/12 (0.0833) usando la distribución Chi-cuadrada.
-* **Prueba Kolmogorov-Smirnov**: Valida la bondad de ajuste de la muestra contra la distribución uniforme acumulada teórica, ordenando los números y comparando la distancia máxima $D$ con el valor crítico para $N=6$.
+### Las 7 Pruebas Estadísticas de Validación ($\alpha = 0.05$):
+1. **Prueba de Medias**: Compara la media muestral $\bar{x}$ contra el valor esperado de 0.5 con estadístico $Z_0 = (\bar{x} - 0.5) \sqrt{12N}$.
+2. **Prueba de Varianza**: Evalúa si la varianza muestral $S^2$ es estadísticamente igual a 1/12 (0.083333) mediante $\chi^2_0 = 12(N-1)S^2$.
+3. **Prueba de Smirnov (Kolmogorov-Smirnov)**: Valida la bondad de ajuste contra la distribución uniforme acumulada teórica $F(x) = x$, calculando $D = \max(D^+, D^-)$.
+4. **Prueba de Póker**: Clasifica los patrones de dígitos decimales de cada número $R_i$ (Todos Diferentes, Un Par, Dos Pares, Tercia, Póker) y los evalúa mediante $\chi^2$.
+5. **Prueba de Serie**: Agrupa números en pares 2D $(R_1, R_2), (R_3, R_4), \dots$ sobre el plano $[0,1] \times [0,1]$ dividido en subceldas $m \times m$ y aplica $\chi^2$.
+6. **Prueba de Huecos**: Mide la longitud de las rachas de ceros (huecos) entre números dentro de un intervalo $[a, b] \subset [0,1]$ contra la distribución geométrica esperada.
+7. **Prueba de Corridas arriba y abajo**: Evalúa la presencia de tendencias analizando la secuencia de signos crecientes y decrecientes con estadístico $Z_0 = (b - \mu_b) / \sigma_b$.
 
 ### Extensiones Teóricas Demostrativas:
 * **Método de la Transformada Inversa (Variables Discretas)**: Simulación interactiva asociando rangos acumulados a categorías discretas.
 * **Método de Composición**: Muestreo continuo por mezcla probabilística ponderada de dos distribuciones uniformes.
+

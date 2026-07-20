@@ -7,7 +7,15 @@ from dotenv import load_dotenv
 
 # Importar módulos propios
 from app.generators import generate_mid_squares, generate_linear_congruential
-from app.stats_tests import run_mean_test, run_variance_test, run_kolmogorov_smirnov_test
+from app.stats_tests import (
+    run_mean_test,
+    run_variance_test,
+    run_kolmogorov_smirnov_test,
+    run_poker_test,
+    run_series_test,
+    run_gap_test,
+    run_runs_up_down_test
+)
 from app.theory import InverseTransformDiscrete, CompositionMethod
 
 # Cargar variables de entorno
@@ -39,7 +47,7 @@ app.add_middleware(
 class MidSquareRequest(BaseModel):
     seed: int = Field(..., description="Semilla inicial. Debe ser un entero positivo.")
     num_digits: int = Field(4, description="Número de dígitos (d) de la semilla. Debe ser un número par >= 4.")
-    count: int = Field(6, description="Cantidad de números a generar (por defecto es 6).")
+    count: int = Field(20, description="Cantidad de números a generar.")
 
     @validator('seed')
     def validate_seed(cls, v):
@@ -67,7 +75,7 @@ class CongruentialRequest(BaseModel):
     a: int = Field(..., description="Multiplicador. Debe ser un entero positivo.")
     c: int = Field(..., description="Incremento. Debe ser un entero no negativo.")
     m: int = Field(..., description="Módulo. Debe ser un entero positivo y mayor que la semilla, multiplicador e incremento.")
-    count: int = Field(6, description="Cantidad de números a generar.")
+    count: int = Field(20, description="Cantidad de números a generar.")
 
     @validator('seed', 'a', 'm')
     def validate_positives(cls, v):
@@ -95,7 +103,7 @@ class CongruentialRequest(BaseModel):
 class DiscreteInverseRequest(BaseModel):
     values: List[str] = Field(..., description="Lista de valores discretos a generar.")
     probabilities: List[float] = Field(..., description="Lista de probabilidades correspondientes que deben sumar 1.0.")
-    count: int = Field(6, description="Cantidad de elementos a generar.")
+    count: int = Field(20, description="Cantidad de elementos a generar.")
 
     @validator('probabilities')
     def validate_probabilities(cls, v):
@@ -106,12 +114,16 @@ class DiscreteInverseRequest(BaseModel):
         return v
 
 
-# Función auxiliar para empaquetar resultados y ejecutar pruebas de uniformidad
+# Función auxiliar para empaquetar resultados y ejecutar las 7 pruebas de uniformidad e independencia
 def package_and_test(numbers: List[float], history: List[Dict[str, Any]]) -> Dict[str, Any]:
-    # Correr las 3 pruebas estadísticas requeridas
+    # Correr las 7 pruebas estadísticas requeridas
     mean_test_res = run_mean_test(numbers)
     var_test_res = run_variance_test(numbers)
     ks_test_res = run_kolmogorov_smirnov_test(numbers)
+    poker_test_res = run_poker_test(numbers)
+    series_test_res = run_series_test(numbers)
+    gap_test_res = run_gap_test(numbers)
+    runs_test_res = run_runs_up_down_test(numbers)
     
     return {
         "generated_numbers": numbers,
@@ -119,7 +131,11 @@ def package_and_test(numbers: List[float], history: List[Dict[str, Any]]) -> Dic
         "tests": {
             "mean_test": mean_test_res,
             "variance_test": var_test_res,
-            "ks_test": ks_test_res
+            "ks_test": ks_test_res,
+            "poker_test": poker_test_res,
+            "series_test": series_test_res,
+            "gap_test": gap_test_res,
+            "runs_test": runs_test_res
         }
     }
 
